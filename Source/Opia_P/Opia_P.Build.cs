@@ -18,8 +18,9 @@ public class Opia_P : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
-		});
+			"Slate",
+            "ApplicationCore"
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
