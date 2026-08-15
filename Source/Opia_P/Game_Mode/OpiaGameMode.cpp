@@ -56,6 +56,16 @@ void AOpiaGameMode::SetupSecondPlayer()
 		return;
 	}
 
+	// CreateLocalPlayer, ikinci oyuncuya GameMode'un varsayilan pawn'ini (BP_Tadashi)
+	// otomatik dogurur. Airi'yi koymadan once onu temizle, yoksa sahnede sahipsiz
+	// bir Tadashi kalir.
+	if (APawn* AutoSpawnedPawn = SecondPC->GetPawn())
+	{
+		UE_LOG(LogTemp, Log, TEXT("[Opia] Otomatik dogan pawn temizleniyor: %s"), *AutoSpawnedPawn->GetName());
+		SecondPC->UnPossess();
+		AutoSpawnedPawn->Destroy();
+	}
+
 	// Airi'nin dogacagi yer: ikinci PlayerStart varsa orasi.
 	TArray<AActor*> PlayerStarts;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
