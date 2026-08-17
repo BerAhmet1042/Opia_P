@@ -117,8 +117,13 @@ void AAiri_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	// Her birini ayri ayri kontrol ediyoruz ki hangisinin eksik oldugunu logdan gorebilesin.
 	if (JumpAction)
 	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AAiri_Character::DoJumpStart);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AAiri_Character::DoJumpEnd);
+		// [Opia] Ziplama artik BPC_Jump component'inde yasiyor.
+		// C++ baglantisi kapatildi, silinmedi: component kaldirilirsa
+		// asagidaki iki satiri yorumdan cikarmak yeterli.
+		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ATadashi_Character::DoJumpStart);
+		// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ATadashi_Character::DoJumpEnd);
+
+		UE_LOG(LogTemp, Log, TEXT("[Opia] %s: JumpAction atanmis, ziplama Blueprint component'ine birakildi."), *GetName());
 	}
 	else
 	{

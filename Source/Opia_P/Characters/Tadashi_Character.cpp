@@ -116,10 +116,15 @@ void ATadashi_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	// Null bir InputAction ile BindAction cagirmak sessizce basarisiz olur.
 	// Her birini ayri ayri kontrol ediyoruz ki hangisinin eksik oldugunu logdan gorebilesin.
 	if (JumpAction)
-	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ATadashi_Character::DoJumpStart);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ATadashi_Character::DoJumpEnd);
-	}
+		{
+			// [Opia] Ziplama artik BPC_Jump component'inde yasiyor.
+			// C++ baglantisi kapatildi, silinmedi: component kaldirilirsa
+			// asagidaki iki satiri yorumdan cikarmak yeterli.
+			// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ATadashi_Character::DoJumpStart);
+			// EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ATadashi_Character::DoJumpEnd);
+
+			UE_LOG(LogTemp, Log, TEXT("[Opia] %s: JumpAction atanmis, ziplama Blueprint component'ine birakildi."), *GetName());
+		}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("[Opia] %s: JumpAction atanmamis."), *GetName());
