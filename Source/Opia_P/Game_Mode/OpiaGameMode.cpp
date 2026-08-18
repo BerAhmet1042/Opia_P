@@ -18,6 +18,43 @@ void AOpiaGameMode::BeginPlay()
 	SetupSecondPlayer();
 }
 
+// Seviyedeki butun PlayerStart'lari tarar, "Player Start Tag" alani verilen
+// etikete esit olani dondurur. Bulamazsa nullptr doner.
+// GetAllActorsOfClass sirasiz calisir; bu yuzden indeks (PlayerStarts[1]) yerine
+// isim kullaniyoruz. Indeks kullanildiginda iki karakter ayni noktada dogabiliyordu.
+APlayerStart* AOpiaGameMode::FindPlayerStartByTag(FName Tag) const
+{
+	TArray<AActor*> PlayerStarts;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
+
+	for (AActor* Actor : PlayerStarts)
+	{
+		APlayerStart* Start = Cast<APlayerStart>(Actor);
+		if (Start && Start->PlayerStartTag == Tag)
+		{
+			return Start;
+		}
+	}
+
+	return nullptr;
+}
+
+// Motor 1. oyuncunun pawn'ini kendi doguruyor ve normalde PlayerStart'lardan
+// rastgele birini seciyor. Burada onu "Tadashi" etiketli olana sabitliyoruz.
+AActor* AOpiaGameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
+	if (APlayerStart* TadashiStart = FindPlayerStartByTag(TadashiStartTag))
+	{
+		return TadashiStart;
+	}
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[Opia] '%s' etiketli PlayerStart bulunamadi, motorun varsayilani kullaniliyor."),
+		*TadashiStartTag.ToString());
+
+	return Super::ChoosePlayerStart_Implementation(Player);
+}
+
 void AOpiaGameMode::SetupSecondPlayer()
 {
 	UGameInstance* GameInstance = GetGameInstance();
@@ -66,22 +103,20 @@ void AOpiaGameMode::SetupSecondPlayer()
 		AutoSpawnedPawn->Destroy();
 	}
 
-	// Airi'nin dogacagi yer: ikinci PlayerStart varsa orasi.
-	TArray<AActor*> PlayerStarts;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
-
+	// Airi'nin dogacagi yer: "Airi" etiketli PlayerStart.
 	FVector SpawnLocation = FVector::ZeroVector;
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
-	if (PlayerStarts.Num() > 1)
+	if (APlayerStart* AiriStart = FindPlayerStartByTag(AiriStartTag))
 	{
-		SpawnLocation = PlayerStarts[1]->GetActorLocation();
-		SpawnRotation = PlayerStarts[1]->GetActorRotation();
+		SpawnLocation = AiriStart->GetActorLocation();
+		SpawnRotation = AiriStart->GetActorRotation();
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning,
-			TEXT("[Opia] Ikinci PlayerStart yok. Airi (0,0,0) noktasinda dogacak — zeminin altinda kalabilir."));
+			TEXT("[Opia] '%s' etiketli PlayerStart yok. Airi (0,0,0) noktasinda dogacak — zeminin altinda kalabilir."),
+			*AiriStartTag.ToString());
 	}
 
 	FActorSpawnParameters SpawnParams;
